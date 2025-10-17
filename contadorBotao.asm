@@ -15,7 +15,7 @@
 .ORG 0x000 ; endereço de inicio
 
 Inicializacoes:
-	LDI AUX, 0b00001111 ; configura as saidas dos leds
+	LDI AUX, 0b00001111 ; configura as saidas dos leds, sendo 0 a entrada e 1 a saida
 	OUT DDRB,AUX
 	
 	LDI AUX, 0b00110000 ; configura os botoes
