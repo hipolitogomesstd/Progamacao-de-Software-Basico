@@ -1,0 +1,28 @@
+.nolist
+.include "m328Pdef.inc"
+.list
+
+.def CONT = R16
+ORG 0x000
+
+Inicializacoes:
+    LDI CONT,0x01111111
+    OUT DDBRD, CONT
+
+    CLR CONT
+
+Principal:
+    OUT PORTD, CONT
+
+    RCALL Atraso
+
+    INC CONT
+    CPI CONT, 10
+    BRNE Principal
+    CRL CONT
+    RJMP Principal
+
+
+Atraso:
+    LDI R19,50
+    RET
