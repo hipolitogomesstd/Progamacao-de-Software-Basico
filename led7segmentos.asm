@@ -12,23 +12,23 @@ Inicio:
     CLR CONT
 
 Principal:
-    LDI ZL, LOW(Tabela*2)
-    LDI ZH, HIGH(Tabela*2)
+    LDI ZL, LOW(Tabela*2) ; pega a parte mais significativa
+    LDI ZH, HIGH(Tabela*2) ; menos signficativa
 
     ADD ZL, CONT
     LDI R17, 0 
-    ADC ZH, R17
+    ADC ZH, R17 ; verifica se dá carry
 
-    LPM R16,Z
+    LPM R16,Z ; carrega o valor de z em R16
     OUT PORTD, R16
 
     RCALL Atraso  
 
     INC CONT
-    CPI CONT,10    
+    CPI CONT,10 ; verifica se é 10
     BRNE Principal
 
-    CLR CONT
+    CLR CONT ; limpa o contador se for igual a 10
     RJMP Principal
 
 Atraso:
