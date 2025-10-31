@@ -3,12 +3,16 @@
 .list
 
 .def UNIDADE = R17
-.def DEZENA= R16
-.ORG 0x00
+.def DEZENA = R16
+
+.ORG 0x000
 
 Inicio:
     LDI R18, 0b00111111
-    OUT DDRD R18
+    OUT DDRB, R18
+
+    LDI R19, 0b00000011
+    OUT DDRB, R19
 
     CLR CONTADOR
     CLR DEZENA
@@ -17,7 +21,19 @@ Principal:
     LDI ZL, LOW(Tabela*2)
     LDI ZH, HIGH(Tabela*2)
 
-    OUT UNIDADE, R18
+    ADD ZL, R18
+    LDI R18, 0
+    ADC ZH, R18
+
+    LPM R16, Z
+    OUT UNIDADE, R17
+
+    RCALL Atraso
+
+    INC UNIDADE
+    CPI UNIDADE, R19
+
+    
     OUT DEZENA, R18
 
 Atraso:
