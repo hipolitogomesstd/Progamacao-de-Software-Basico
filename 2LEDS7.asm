@@ -4,53 +4,49 @@
 
 .def UNIDADE = R17
 .def DEZENA = R16
+.def LED = R18
+
+.def AUX = R22
+
+.equ display1 = PC0
+.equ display2 = PC1
 
 .ORG 0x000
 
 Inicio:
-    LDI R18, 0b00111111
-    OUT DDRB, R18
-
-    LDI R19, 0b00000011
-    OUT DDRB, R19
-
-    CLR CONTADOR
+    ; Configura PORTB como saída (displays de 7 segmentos)
+    LDI AUX, 0b11111111
+    OUT DDRB, AUX
+    
+    ; Configura PC0 e PC1 como saída (seleção de display)
+    LDI AUX, 0b00000011
+    OUT DDRC, AUX
+    
+    ; Inicializa contadores
+    CLR UNIDADE
     CLR DEZENA
 
 Principal:
-    LDI ZL, LOW(Tabela*2)
-    LDI ZH, HIGH(Tabela*2)
 
-    ADD ZL, R18
-    LDI R18, 0
-    ADC ZH, R18
-
-    LPM R16, Z
-    OUT UNIDADE, R17
-
-    RCALL Atraso
-
-    INC UNIDADE
-    CPI UNIDADE, R19
-
+Dezena:
     
-    OUT DEZENA, R18
-
+    
 Atraso:
-    LDI R19, 255
-Atraso_1:
+    LDI R19, 100
+Atraso1:
     LDI R20, 255
-Atraso_2:
+Atraso2:
     LDI R21, 255
 
-Atraso_loop:
+Loop:
     DEC R21
-    BRNE Atraso_loop
+    BRNE Loop
     DEC R20
-    BRNE Atraso_2
+    BRNE Atraso2
     DEC R19
-    Atraso_1
-    RET
+    BRNE Atraso1
+    RET    ; 
+
 
 
 Tabela:
