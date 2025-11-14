@@ -2,52 +2,129 @@
 .include "m328Pdef.inc"
 .list
 
-.def UNIDADE = R17
-.def DEZENA = R16
+.def UNIDADE = R16
+.def DEZENA = R17
 .def LED = R18
 
-.def AUX = R22
+.def AUX = R19
 
 .equ display1 = PC0
 .equ display2 = PC1
 
-.ORG 0x000
-
 Inicio:
     ; Configura PORTB como saída (displays de 7 segmentos)
-    LDI AUX, 0b11111111
+    LDI AUX, 0b01111111
     OUT DDRB, AUX
-    
-    ; Configura PC0 e PC1 como saída (seleção de display)
+
+    ; Configura PC0 e PC1 como saída, e passa novamente para 0x00000000
     LDI AUX, 0b00000011
     OUT DDRC, AUX
     
-    ; Inicializa contadores
+    ; limpa os contadores para começar do 0
     CLR UNIDADE
     CLR DEZENA
 
 Principal:
+    ; chama a funçao de contar 
+    RCALL ContadorSegundo
+    ; chama a funçao de incrementar os segundo
+    RCALL IncSegundo
+    ;pula para o contador novamente
+    RJMP Principal
+    
+RotinaUnidade:
+    ;carrega o auxliar com a saida do botao pc0
+    LDI AUX, 0b00000001
+    ;avisa que a saida de aux é portaC
+    OUT PORTC, AUX
+    ;carrega ZL com o bit menos significativo da tabela
+    LDI ZL, LOW(Tabela*2)
+    ;carrega o bit mais significativo em ZH
+    LDI ZH, HIGH(Tabela*2)
 
-Dezena:
+    ;adiciona o valor de ZL em UNIDADE
+    ADD ZL, UNIDADE
+    ;carrega aux com o valor 0
+    LDI AUX, 0
+    ;adiciona o carry de aux em ZH
+    ADC ZH, AUX
+    ;carrega o valor de Z da memoria em LED
+    LPM LED, Z
     
+    ;printa em portB o valor do led
+    OUT PORTB, LED
+    RET
     
+RotinaDezena:
+    ;carrega o valor de PC1 
+    LDI AUX, 0b00000010
+    ;printa o valor de aux em portC
+    OUT PORTC, AUX
+
+    ;carrega o o bit menos signficativo da tabela em ZL
+    LDI ZL, LOW(Tabela*2)
+    ;carrega o bit mais significativo da tabela em ZH
+    LDI ZH, HIGH(Tabela*2)
+
+    ;adciona o valor de ZL em DEZENA
+    ADD ZL, DEZENA
+    ;carrega o AUX com o valor 0
+    LDI AUX, 0
+    ;adiciona o carry de aux em ZH
+    ADC ZH, AUX
+    ;carrega o valor do ponteiro Z do para o led
+    LPM LED, Z
+
+
+    OUT PORTB, LED
+    RET
+IncSegundo:
+    ;incrementa um na UNIDADE
+    INC UNIDADE 
+    ;compara se unidade não é 10
+    CPI UNIDADE, 10 
+    ;se unidade for diferente 10 chama pular
+    BRNE Pular
+    ;se for igual limpa o valor de UNIDADE
+    CLR UNIDADE 
+
+    ;incrementa um na DEZENA
+    INC DEZENA 
+    ;compara se o valor da DEZENA é 6
+    CPI DEZENA, 6
+    ;se não for igual chama a função pular
+    BRNE Pular
+    ;se for igual limpa o valor da DEZENA
+    CLR DEZENA
+    RET 
+Pular:
+    RET
+;atraso para 
 Atraso:
-    LDI R19, 100
-Atraso1:
-    LDI R20, 255
+    LDI R20, 42
 Atraso2:
-    LDI R21, 255
+    LDI R21, 10
 
 Loop:
     DEC R21
     BRNE Loop
     DEC R20
     BRNE Atraso2
-    DEC R19
-    BRNE Atraso1
-    RET    ; 
+    RET  
 
+;Ccontador para de 1 segundo 
+ContadorSegundo:
+    LDI R22, 100
+LoopContador:
+    RCALL RotinaUnidade
+    RCALL Atraso
 
+    RCALL RotinaDezena
+    RCALL Atraso
+
+    DEC R22
+    BRNE LoopContador
+    RET
 
 Tabela:
     .DB 0b00111111, 0b00000110  ; 0, 1
