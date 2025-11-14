@@ -8,8 +8,10 @@
 
 .def AUX = R19
 
-.equ display1 = PC0
-.equ display2 = PC1
+.equ display1 = PC1
+.equ display2 = PC0
+
+.ORG 0x000
 
 Inicio:
     ; Configura PORTB como saída (displays de 7 segmentos)
@@ -34,7 +36,7 @@ Principal:
     
 RotinaUnidade:
     ;carrega o auxliar com a saida do botao pc0
-    LDI AUX, 0b00000001
+    LDI AUX, 0b00000010
     ;avisa que a saida de aux é portaC
     OUT PORTC, AUX
     ;carrega ZL com o bit menos significativo da tabela
@@ -57,7 +59,7 @@ RotinaUnidade:
     
 RotinaDezena:
     ;carrega o valor de PC1 
-    LDI AUX, 0b00000010
+    LDI AUX, 0b00000001
     ;printa o valor de aux em portC
     OUT PORTC, AUX
 
@@ -75,9 +77,9 @@ RotinaDezena:
     ;carrega o valor do ponteiro Z do para o led
     LPM LED, Z
 
-
     OUT PORTB, LED
     RET
+
 IncSegundo:
     ;incrementa um na UNIDADE
     INC UNIDADE 
@@ -97,13 +99,15 @@ IncSegundo:
     ;se for igual limpa o valor da DEZENA
     CLR DEZENA
     RET 
+
 Pular:
     RET
-;atraso para 
+
+;atraso para o multiplexador, define a quantidade vezes que ele pisca
 Atraso:
-    LDI R20, 42
+    LDI R20, 250
 Atraso2:
-    LDI R21, 10
+    LDI R21, 255
 
 Loop:
     DEC R21
@@ -112,9 +116,9 @@ Loop:
     BRNE Atraso2
     RET  
 
-;Ccontador para de 1 segundo 
+;Contador para de 1 segundo 
 ContadorSegundo:
-    LDI R22, 100
+    LDI R22, 80
 LoopContador:
     RCALL RotinaUnidade
     RCALL Atraso
@@ -125,6 +129,7 @@ LoopContador:
     DEC R22
     BRNE LoopContador
     RET
+    
 
 Tabela:
     .DB 0b00111111, 0b00000110  ; 0, 1
