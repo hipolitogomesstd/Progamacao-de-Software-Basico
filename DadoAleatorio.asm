@@ -1,13 +1,12 @@
 .nolist
 .include "m328Pdef.inc"
 .list
-
 .equ Botao = PC0
 .equ Display =PORTB
 .def Contador = R16
 .def AUX = R17
 
-.ORG 0x0000
+.ORG 0x000
 
 Inicializacoes:
     LDI AUX, 0b11111110
@@ -32,7 +31,7 @@ Decod:
 
     RJMP Principal 
 Atraso:
-    LDI R19,2
+    LDI R19,1
 Volta:
     DEC R17
     BRNE volta
@@ -42,8 +41,8 @@ Volta:
     BRNE volta
     RET
 Decodifica:
-    LDI ZH, HIGH(Tabela<<1)
-    LDI ZL, LOW(Tabela<<1)
+    LDI ZH, HIGH(Tabela*2)
+    LDI ZL, LOW(Tabela*2)
     ADD ZL, Contador
     LDI R17, 0
     ADC ZH, R17
@@ -52,4 +51,6 @@ Decodifica:
     OUT Display, R21
     RET
 Tabela:
-    .db 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D
+    .db 0b11110111, 0b11101110
+    .db 0b11100110, 0b01101010
+    .db 0b01000010, 0b00000000
