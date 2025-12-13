@@ -1,0 +1,39 @@
+#include <LiquidCrystal.h>
+
+// Configura os pinos do LCD conforme montamos
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+const int pinoSensor = A1; // Potenciômetro simulando o sensor
+
+void setup() {
+  lcd.begin(16, 2); // Inicia o LCD
+  lcd.print("Medidor Energia");
+  delay(2000);
+  lcd.clear();
+}
+
+void loop() {
+  // 1. Lê o valor do potenciômetro (0 a 1023)
+  int leituraSensor = analogRead(pinoSensor);
+  
+  // 2. Converte essa leitura em uma "Corrente Falsa" para teste
+  // Vamos fingir que 1023 (max) é igual a 30 Amperes
+  float corrente = map(leituraSensor, 0, 1023, 0, 3000) / 100.0;
+  
+  // 3. Calcula a Potência (P = V * I)
+  // Assumindo tensão de 127V (mude para 220 se quiser)
+  float potencia = corrente * 127.0;
+  
+  // 4. Mostra no Display
+  lcd.setCursor(0, 0);
+  lcd.print("I: ");
+  lcd.print(corrente);
+  lcd.print(" A    "); // Espaços para limpar sobra de texto
+  
+  lcd.setCursor(0, 1);
+  lcd.print("P: ");
+  lcd.print(potencia, 1); // 1 casa decimal
+  lcd.print(" W    ");
+  
+  delay(500); // Atualiza a cada meio segundo
+}
